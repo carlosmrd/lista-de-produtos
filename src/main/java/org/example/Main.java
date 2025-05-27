@@ -10,6 +10,7 @@ public class Main {
     public static void main(String[] args) {
 
         while (true) {
+
             System.out.println("\n----- MENU -----");
             System.out.println("1. Cadastro de produto");
             System.out.println("2. Listar ou buscar produtos");
