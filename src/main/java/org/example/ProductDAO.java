@@ -14,13 +14,14 @@ public class ProductDAO {
 
     // CREATE
     public void addProduct(Product product) {
-        String sql = "INSERT INTO products(name, price) VALUES(?, ?)";
+        String sql = "INSERT INTO products(name, price, quantity) VALUES(?, ?, ?)";
         try (
                 Connection conn = DatabaseManager.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
             pstmt.setString(1, product.getName());
             pstmt.setDouble(2, product.getPrice());
+            pstmt.setInt(3, product.getQuantity());
             pstmt.executeUpdate();
             System.out.println("Produto adicionado: " + product.getName());
         } catch (SQLException e) {
@@ -31,7 +32,7 @@ public class ProductDAO {
     // READ (Todos os produtos)
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT id, name, price FROM products";
+        String sql = "SELECT id, name, price, quantity FROM products";
         try (
                 Connection conn = DatabaseManager.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -41,7 +42,8 @@ public class ProductDAO {
                 Product product = new Product(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getDouble("price")
+                        rs.getDouble("price"),
+                        rs.getInt("quantity")
                 );
                 products.add(product);
             }
@@ -53,7 +55,7 @@ public class ProductDAO {
 
     // READ (Por ID)
     public Product getProductById(int id) {
-        String sql = "SELECT id, name, price FROM products WHERE id = ?";
+        String sql = "SELECT id, name, price, quantity FROM products WHERE id = ?";
         try (
                 Connection conn = DatabaseManager.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
@@ -65,7 +67,8 @@ public class ProductDAO {
                 return new Product(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getDouble("price")
+                        rs.getDouble("price"),
+                        rs.getInt("quantity")
                 );
             }
         } catch (SQLException e) {
@@ -76,14 +79,15 @@ public class ProductDAO {
 
     // UPDATE
     public void updateProduct(Product product) {
-        String sql = "UPDATE products SET name = ?, price = ? WHERE id = ?";
+        String sql = "UPDATE products SET name = ?, price = ?, quantity = ? WHERE id = ?";
         try (
                 Connection conn = DatabaseManager.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
             pstmt.setString(1, product.getName());
             pstmt.setDouble(2, product.getPrice());
-            pstmt.setInt(3, product.getId());
+            pstmt.setInt(3, product.getQuantity());
+            pstmt.setInt(4, product.getId());
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Produto atualizado: " + product.getName());
