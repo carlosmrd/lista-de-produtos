@@ -11,6 +11,7 @@ public class Main {
 
         while (true) {
 
+            //Menu do programa
             System.out.println("\n----- MENU -----");
             System.out.println("1. Cadastro de produto");
             System.out.println("2. Listar ou buscar produtos");
@@ -80,19 +81,31 @@ public class Main {
         System.out.println("\n--- Adicionando Produtos ---");
         System.out.print("Insira o nome do produto: ");
         String name = scanner.nextLine();
+
         System.out.print("Insira o valor do produto: ");
         double price = scanner.nextDouble();
         scanner.nextLine();
 
-        productDAO.addProduct(new Product(name, price));
+        System.out.print("Insira a quantidade em estoque: ");
+        int quantity = scanner.nextInt();
+        scanner.nextLine();
+
+        //Construtor para adicionar novo produto ao banco de dados
+        productDAO.addProduct(new Product(name, price, quantity));
 
     }
 
     // 2. READ - Listar todos os produtos
     private static void listarProdutos() {
+
         System.out.println("\n--- Lista de Produtos ---");
+
+        //Cria uma lista de produtos
         List<Product> products = productDAO.getAllProducts();
+
+        //Exibe todos os produtos da lista
         products.forEach(System.out::println);
+
     }
 
     // 3. READ - Buscar um produto por ID
@@ -102,6 +115,7 @@ public class Main {
         System.out.print("Insira o ID do produto: ");
         int id = scanner.nextInt();
 
+        //Verifica os produtos pelo ID e instancia um objeto para ser exibido
         Product productFound = productDAO.getProductById(id);
 
         if (productFound != null) {
@@ -112,34 +126,86 @@ public class Main {
 
     }
 
-    // 4. UPDATE - Atualizar um produto (supondo que o Mouse tenha ID 2)
+    // 4. UPDATE - Atualizar um produto
     private static void atualizarProduto() {
 
         System.out.println("\n--- Atualizando Produto ---");
-        System.out.print("Insira o ID do produto: ");
-        int id = scanner.nextInt();
 
-        Product productToUpdate = new Product(id,
-                "Mouse Sem Fio",
-                199.99);
+        boolean productExists = false;
+        int id = 0;
 
+        //Mostrar qual o produto referente ao ID informado antes da exclusão.
+        //Se o produto com o ID especificado não existir, recomeça o processo de exclusão.
+        while (!productExists) {
+
+            System.out.print("Insira o ID do produto: ");
+            id = scanner.nextInt();
+            scanner.nextLine();
+
+            Product productFound = productDAO.getProductById(id);
+
+            if (productFound != null) {
+                System.out.println("Produto selecionado: " + productFound);
+                productExists = true;
+            } else {
+                System.out.println("Produto com ID " + id + " não encontrado.");
+            }
+
+        }
+
+        //Atualização do produto
+        System.out.print("Insira o novo nome do produto: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Insira o novo preço do produto: ");
+        double price = scanner.nextDouble();
+        scanner.nextLine();
+
+        System.out.print("Insira a quantidade em estoque: ");
+        int quantity = scanner.nextInt();
+        scanner.nextLine();
+
+        Product productToUpdate = new Product(id, name, price, quantity);
         productDAO.updateProduct(productToUpdate);
 
+        //Listar os produtos
         System.out.println("\n--- Lista de Produtos após Atualização ---");
         productDAO.getAllProducts().forEach(System.out::println);
 
     }
 
-    // 5. DELETE - Excluir um produto (supondo que o Teclado Mecânico tenha ID 3)
+    // 5. DELETE - Excluir um produto
     private static void excluirProduto() {
-        System.out.println("\n--- Excluindo Produto (ID 3) ---");
-        productDAO.deleteProduct(3);
 
+        System.out.println("\n--- Excluindo Produto ---");
+
+        boolean productExists = false;
+        int id = 0;
+
+        //Mostrar qual o produto referente ao ID informado antes da exclusão.
+        //Se o produto com o ID especificado não existir, recomeça o processo de exclusão.
+        while (!productExists) {
+
+            System.out.print("Insira o ID do produto: ");
+            id = scanner.nextInt();
+            scanner.nextLine();
+
+            Product productFound = productDAO.getProductById(id);
+
+            if (productFound != null) {
+                System.out.println("Produto " + id + ": " + productFound);
+                productExists = true;
+            } else {
+                System.out.println("Produto com ID " + id + " não encontrado.");
+            }
+
+        }
+
+        productDAO.deleteProduct(id);
+
+        //Listar os produtos
         System.out.println("\n--- Lista de Produtos após Exclusão ---");
         productDAO.getAllProducts().forEach(System.out::println);
 
-        // Tentando excluir um produto que não existe
-        System.out.println("\n--- Tentando Excluir Produto Inexistente (ID 99) ---");
-        productDAO.deleteProduct(99);
     }
 }
